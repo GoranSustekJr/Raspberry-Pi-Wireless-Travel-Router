@@ -77,3 +77,45 @@ sudo apt-get install hostapd dnsmasq bridge-utils
 ```
 And wait. We need *hostapd* to create the access point. *Dnsmasq* is needed for DNS and DHCP configuration, while *bridge-utils* will create a bridge. The bridge is between **etho0** and **wlan0** interfaces. Iw will bridge them into one interface that we will call **br0**. When bridge because my raspberry pi 4 has ethernet and I want to connect my computer to pi's internet. If you do not want that just leave out *eth0* when the *br0* interface will be configured
 # **Step 5. - Editing ```/etc/network/interfaces``` again**
+Type
+```
+sudo nano /etc/network/interfaces
+```
+Now it should look like this:
+```
+# interfaces(5) file used by ifup(8) and ifdown(8)
+# Include files from /etc/network/interfaces.d:
+source /etc/network/interfaces.d/*
+
+# Loopback
+auto lo
+iface lo inet loopback
+
+# Wlan1
+auto wlan1
+iface wlan1 inet dhcp
+        wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
+
+# eth0
+iface eth0 inet manual
+
+# Wlan0
+auto wlan0
+iface wlan0 inet manual
+
+# Bridge
+auto br0
+iface br0 inet static
+        bridge_ports wlan0 eth0
+        address 192.168.200.1
+#        network 192.168.200.0
+#        netmask 255.255.255.0
+#        broadcast 192.168.200.255
+#        post-up route add default gw 192.168.0.1 br0
+```
+So *eth0* and *wlan0* were added, with set to manual configuration(by br0 configuration because they are bridge ports). Interface **br0** is static. It has ```bridge_ports``` which it makes the bridget out of. 
+!!!!!!!!!!
+If you do not want eth0 in there, remove eth0 from bridge_ports and set ```iface eth0 inet dhcp```
+!!!!!!!!!!
+Static interface address needs to be specified. Other is commented out because as I was repeating this to make sure everything works every time, I commented out options that were not needed. If you have some problem with ```networking.service``` at the and, try uncommenting some of them, but it should now be a problem because every commented option should be overwriten by dnsmasq.
+# **Step 5. - Editing hostapd**
