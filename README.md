@@ -353,4 +353,50 @@ exit 0
 ```
 Do **not** uncomment first line. It is one of the trouble makers. If it is uncommented, rc will on every boot be in conflict with systemctl. I left it for the purpose of education.
 - iptables-restore < /etc/iptables.ipv4.nat - restores IP tables rules on every boot
+```
 **Now reboot and try!!!**
+```
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# **Bonus - AdGuard Home**
+For those who want adblocker dns with your raspberry pi fully wireless router.
+```
+**1. - Download Adguard Home for linux and arm**
+```
+```
+wget https://static.adtidy.org/adguardhome/release/AdGuardHome_linux_armv7.tar.gz
+```
+```
+**2. - Use tar command to untar it**
+```
+```
+tar xvf AdGuardHome_linux_armv7.tar.gz
+```
+```
+**3. - Cd into the directory AdGuardHome and run the installation**
+```
+```
+sudo ./AdGuardHome -s install
+```
+```
+**4. - Go to web browser and type $YourRaspberryPiIPaddress:3000**
+```
+```
+a)
+- Click get started
+b)
+- Choose different port for admin
+- If DNS is already in use, which it should be, we need to change the port to something other then 53
+3)
+- Choose name and password then click next
+```
+Now we just need to edit ```/etc/dnsmasq.conf``` to specify *AdGuard Home* as our **DNS** server.
+```
+sudo nano /etc/dnsmasq.conf
+```
+Comment out servers and make a new one that looks like this:
+```
+server=127.0.0.1#x
+#server=1.1.1.1
+#server=8.8.8.8
+```
+x shall be the port number you specified moments ago. I put mine ```server=127.0.0.1#5300```. DHCP configuration shall stay so don't remove it. Now go to console and choose your blacklist, and enjoy. :)
