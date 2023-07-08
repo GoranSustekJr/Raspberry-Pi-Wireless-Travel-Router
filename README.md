@@ -120,7 +120,7 @@ If you do not want eth0 in there, remove eth0 from bridge_ports and set ```iface
 !!!!!!!!!!
 ```
 Static interface address needs to be specified. Other is commented out because as I was repeating this to make sure everything works every time, I commented out options that were not needed. If you have some problem with ```networking.service``` at the and, try uncommenting some of them, but it should now be a problem because every commented option should be overwriten by dnsmasq.
-# **Step 5. - Configuring hostapd**
+# **Step 6. - Configuring hostapd**
 We need to create and edit hostapd.conf file to enable AP mode on our raspberry pi. Create and edit the file by typing
 ```
 sudo nano /etc/hostapd/hostapd.conf
@@ -209,5 +209,148 @@ DAEMON_CONF="/etc/hostapd/hostapd.conf"
 #
 #DAEMON_OPTS=""
 ```
-With that specified, next on TODO is
-# **Step 5. - Configuring dnsmasq**
+We need to unmask the ```hostapd.service``` so type in:
+```
+sudo systemctl unmask hostapd.service
+```
+Then start the service by typing 
+```
+sudo systemctl start hostapd.service
+```
+Now you should see the SSID on your phone. With that enabled and started, next on TODO is
+# **Step 7. - Configuring dnsmasq**
+Dnsmasq will handle **DHCP** and **DNS**. Edit the following
+```
+sudo nano /etc/dnsmasq.conf
+```
+The default file is huge and all commented out. On top just add the following lines:
+```
+#  DHCP configuration
+dhcp-range=br0,192.168.200.20,192.168.200.220,255.255.255.0,24h
+# DNS configuration
+server=1.1.1.1
+server=8.8.8.8
+```
+Save that. Now it is **crucial** to disable ```dhcpcd.service``` or we will have problems
+```
+sudo systemctl disable dhcpcd.service
+```
+# **Step 8. - Last tasks**
+In order to have internet connection when connected to he *AP*, we need to **enable ipv4 forwarding**. Edit 
+```
+sudo nano /etc/sysctl.conf
+```
+find where is commented out ```net.ipv4.ip_forward=1``` so the file looks like this
+```
+# /etc/sysctl.conf - Configuration file for setting system variables
+# See /etc/sysctl.d/ for additional system variables.
+# See sysctl.conf (5) for information.
+#
+
+#kernel.domainname = example.com
+
+# Uncomment the following to stop low-level messages on console
+#kernel.printk = 3 4 1 3
+
+###################################################################
+# Functions previously found in netbase
+#
+
+# Uncomment the next two lines to enable Spoof protection (reverse-path filter)
+# Turn on Source Address Verification in all interfaces to
+# prevent some spoofing attacks
+#net.ipv4.conf.default.rp_filter=1
+#net.ipv4.conf.all.rp_filter=1
+
+# Uncomment the next line to enable TCP/IP SYN cookies
+# See http://lwn.net/Articles/277146/
+# Note: This may impact IPv6 TCP sessions too
+#net.ipv4.tcp_syncookies=1
+
+# Uncomment the next line to enable packet forwarding for IPv4
+net.ipv4.ip_forward=1
+
+# Uncomment the next line to enable packet forwarding for IPv6
+#  Enabling this option disables Stateless Address Autoconfiguration
+#  based on Router Advertisements for this host
+#net.ipv6.conf.all.forwarding=1
+
+
+###################################################################
+# Additional settings - these settings can improve the network
+# security of the host and prevent against some network attacks
+# including spoofing attacks and man in the middle attacks through
+# redirection. Some network environments, however, require that these
+# settings are disabled so review and enable them as needed.
+#
+# Do not accept ICMP redirects (prevent MITM attacks)
+#net.ipv4.conf.all.accept_redirects = 0
+#net.ipv6.conf.all.accept_redirects = 0
+# _or_
+# Accept ICMP redirects only for gateways listed in our default
+# gateway list (enabled by default)
+# net.ipv4.conf.all.secure_redirects = 1
+#
+# Do not send ICMP redirects (we are not a router)
+#net.ipv4.conf.all.send_redirects = 0
+#
+# Do not accept IP source route packets (we are not a router)
+#net.ipv4.conf.all.accept_source_route = 0
+#net.ipv6.conf.all.accept_source_route = 0
+#
+# Log Martian Packets
+#net.ipv4.conf.all.log_martians = 1
+#
+
+###################################################################
+# Magic system request Key
+# 0=disable, 1=enable all, >1 bitmask of sysrq functions
+# See https://www.kernel.org/doc/html/latest/admin-guide/sysrq.html
+# for what other values do
+#kernel.sysrq=438
+```
+Next is **enablin NAT**. in the terminal type:
+```
+sudo iptables -t nat -A POSTROUTING -o wlan1 -j MASQUERADE
+```
+- -t nat - specifies nat table for the nat translation use
+- -A POSTROUTING - appends the rule to POSTROUTING chain
+- -o wlan1 - specifies wlan1 interface
+- -j MASQUERADE - Allows natwork translation
+We need to save the rules to *ip tables*
+```
+sudo sh -c "iptables-save > /etc/iptables.ipv4.nat"
+```
+- sh -c - will run in a new shell
+- iptables-save > /etc/iptables.ipv4.nat - it will save output of iptables-save to /etc/iptables.ipv4.nat file
+To load those rules on every boot we need to edit ```/etc/rc.local```.
+```
+sudo nano /etc/rc.local
+```
+Before ```exit 0``` put two lines like this:
+```
+#!/bin/sh -e
+#
+# rc.local
+#
+# This script is executed at the end of each multiuser runlevel.
+# Make sure that the script will "exit 0" on success or any other
+# value on error.
+#
+# In order to enable or disable this script just change the execution
+# bits.
+#
+# By default this script does nothing.
+
+# Print the IP address
+_IP=$(hostname -I) || true
+if [ "$_IP" ]; then
+  printf "My IP address is %s\n" "$_IP"
+fi
+#sudo hostapd /etc/hostapd/hostapd.conf &
+iptables-restore < /etc/iptables.ipv4.nat
+exit 0
+```
+Do **not** uncomment first line. It is one of the trouble makers. If it is uncommented, rc will on every boot be in conflict with systemctl. I left it for the purpose of education.
+- iptables-restore < /etc/iptables.ipv4.nat - restores IP tables rules on every boot
+**Now reboot and try!!!**
