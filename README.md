@@ -56,4 +56,24 @@ network={
         psk="password"
 }
 ```
-Make sure to change ```country=US``` to your country. Also change ```ssid="SSID"``` and ```psk="password"``` to your **Home Wifi** or whoever you want to connect to. We use ```/etc/network/interfaces``` file to specifi out network interfaces. ```auto lo``` and ```auto wlan1``` mean that on every boot interfaces *lo* and *wlan1* will automatically start. The ```iface wlan1 inet dhcp``` means that interface wlan1 will obtain IP address by DHCP. 
+Make sure to change ```country=US``` to your country. Also change ```ssid="SSID"``` and ```psk="password"``` to your **Home Wifi** or whoever you want to connect to. We use ```/etc/network/interfaces``` file to specifi out network interfaces. ```auto lo``` and ```auto wlan1``` mean that on every boot interfaces *lo* and *wlan1* will automatically start. The ```iface wlan1 inet dhcp``` means that interface wlan1 will obtain IP address by DHCP. The ```wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf``` line says that network configuration that wlan1 connects to is in that directory. Now we gotta reboot and check if we have internet connection.
+```
+sudo reboot
+```
+After the reboot
+```
+ping google.com
+```
+If it is good we should proceed to step 3.
+# **Step 3. - Upating and upgrading the system**
+Every day you turn on your linux system you should update. So let's do it. Type in
+```
+sudo apt-get update && sudo apt-get upgrade
+```
+# **Step 4. - Installing essentials**
+To make this work we need **hostapd**, **dnsmasq** and **bridge-utils**. Type
+```
+sudo apt-get install hostapd dnsmasq bridge-utils
+```
+And wait. We need *hostapd* to create the access point. *Dnsmasq* is needed for DNS and DHCP configuration, while *bridge-utils* will create a bridge. The bridge is between **etho0** and **wlan0** interfaces. Iw will bridge them into one interface that we will call **br0**. When bridge because my raspberry pi 4 has ethernet and I want to connect my computer to pi's internet. If you do not want that just leave out *eth0* when the *br0* interface will be configured
+# **Step 5. - Editing ```/etc/network/interfaces``` again**
