@@ -1,5 +1,5 @@
 # **About This Manual**
-So it all started with trying to recreate [NetworkChucks wireless travel router](https://www.youtube.com/@NetworkChuck). I was watching him and tried openWRT. Unfortunately, my first WiFi dongle doesn't support AP but for second that does support AP, openWRT does not have the driver. So I searched more and found RaspAP. I configured it but it is very unreliable. Many people can have only 1 or 2 devices connected, some up tp 30 at the same time and there is no fix at the moment. I could have only 1 and sometimes 2 devices. So I had to dig deeper. Nothing else was found. The only thing was to configure it myself from terminal. For this to work, I spent 2 weeks reaserching and finaly succeded with, I think, no problems. It seems big, but half of it are examples of files that need to be changed. :)
+So it all started with trying to recreate [NetworkChucks wireless travel router](https://www.youtube.com/@NetworkChuck). I was watching him and tried openWRT. Unfortunately, my first WiFi dongle doesn't support AP mode, and the second one that does support AP mode doesn't have a driver for openWRT. So I searched more and found RaspAP. I configured it but it is very unreliable. Some people could only connect 1 or 2 devices, while others were able to connect up to 30 devices simultaneously. I could have only 1 and sometimes 2 devices. So I had to dig deeper. However, I was unable to find any other viable solutions. The only possible solution was to configure it myself from terminal. For this to work, I spent 2 weeks reaserching and finaly succeded with, I think, no problems. It seems big, but half of it are examples of files that need to be changed. :)
 # **What do you need?**
 - Raspberry pi with built in NIC that has AP mode
 - WiFi dongle that doesn't need to support AP mode
@@ -41,11 +41,11 @@ auto wlan1
 iface wlan1 inet dhcp
         wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
 ```
-Save that. Now we need to edit ```/etc/wpa_supplicant/wpa_supplicant.conf``` file. Type
+After saving the changes, the next step involves editing the  ```/etc/wpa_supplicant/wpa_supplicant.conf``` file. Type
 ```
 sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
 ```
-After editing the file shall look like this:
+After making the edits, the file should look like this:
 ```
 ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
 update_config=1
@@ -170,7 +170,7 @@ wpa_key_mgmt=WPA-PSK
 # WPA key settings
 wpa_pairwise=CCMP
 ```
-Save and exit. We have specified interface *wlan0* which we want in AP mode. Also we specified the bridge *br0*, and the rest of the WiFi configuration. **Change ```ssid```, ```country_code``` and ```wpa_passphrase```**. About the *802.11 mode*, if you want 2.4 GHz, leave it as ```hw_mode=g``` but if you want *802.11ac* change that to 
+Save and exit. We have specified interface *wlan0* which we want in AP mode. Also we specified the bridge *br0*, and the rest of the WiFi configuration. **Change ```ssid```, ```country_code``` and ```wpa_passphrase```**.  Regarding the *802.11 mode*, if you want 2.4 GHz, leave it as ```hw_mode=g```. However, if you want to configure 802.11ac, change it to:
 ```
 hw_mode=a# If hw_mode set to a, uncomment next two lines for ac mode which is supported on raspberry pi 4 B AND CHANGE CHANNEL!!!!!!!!
 ieee80211ac=1 
@@ -179,7 +179,7 @@ vht_oper_chwidth=1s
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!CHANGE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 channel=6
 ```
-This is not manual for *802.11ac* so if you want to try and configure 802.11ac google it. If you want try [https://blog.fraggod.net/2017/04/27/wifi-hostapd-configuration-for-80211ac-networks.html](https://blog.fraggod.net/2017/04/27/wifi-hostapd-configuration-for-80211ac-networks.html). Don't forget to change channel if needed!. Next we need to specify that hostapd.conf to ```/etc/default/hostapd```. Type
+This is not manual for *802.11ac* so if you want to try and configure 802.11ac google it. If you want try [https://blog.fraggod.net/2017/04/27/wifi-hostapd-configuration-for-80211ac-networks.html](https://blog.fraggod.net/2017/04/27/wifi-hostapd-configuration-for-80211ac-networks.html). Don't forget to change channel if needed! Next we need to specify that hostapd.conf to ```/etc/default/hostapd```. Type
 ```
 sudo nano /etc/default/hostapd
 ```
@@ -209,11 +209,11 @@ DAEMON_CONF="/etc/hostapd/hostapd.conf"
 #
 #DAEMON_OPTS=""
 ```
-We need to unmask the ```hostapd.service``` so type in:
+Unmask the ```hostapd.service``` by typing:
 ```
 sudo systemctl unmask hostapd.service
 ```
-Then start the service by typing 
+Start the service by typing 
 ```
 sudo systemctl start hostapd.service
 ```
@@ -359,36 +359,24 @@ Do **not** uncomment first line. It is one of the trouble makers. If it is uncom
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # **Bonus - AdGuard Home**
 For those who want adblocker dns with your raspberry pi fully wireless router.
-```
-**1. - Download Adguard Home for linux and arm**
-```
+
+- **1. - Download Adguard Home for linux and arm**
 ```
 wget https://static.adtidy.org/adguardhome/release/AdGuardHome_linux_armv7.tar.gz
 ```
-```
-**2. - Use tar command to untar it**
-```
+- **2. - Use tar command to untar it**
 ```
 tar xvf AdGuardHome_linux_armv7.tar.gz
 ```
-```
-**3. - Cd into the directory AdGuardHome and run the installation**
-```
+- **3. - Cd into the directory AdGuardHome and run the installation**
 ```
 sudo ./AdGuardHome -s install
 ```
-```
-**4. - Go to web browser and type $YourRaspberryPiIPaddress:3000**
-```
-```
-a)
+- **4. - Go to web browser and type ${YourRaspberryPiIPaddress}:3000**
 - Click get started
-b)
 - Choose different port for admin
 - If DNS is already in use, which it should be, we need to change the port to something other then 53
-3)
 - Choose name and password then click next
-```
 Now we just need to edit ```/etc/dnsmasq.conf``` to specify *AdGuard Home* as our **DNS** server.
 ```
 sudo nano /etc/dnsmasq.conf
@@ -399,4 +387,4 @@ server=127.0.0.1#x
 #server=1.1.1.1
 #server=8.8.8.8
 ```
-x shall be the port number you specified moments ago. I put mine ```server=127.0.0.1#5300```. DHCP configuration shall stay so don't remove it. Now go to console and choose your blacklist, and enjoy. :)
+x shall be the port number you specified moments ago. I put mine ```server=127.0.0.1#5300```. DHCP configuration shall stay so don't remove it. Now go to console, choose your blacklist, and enjoy. :)
