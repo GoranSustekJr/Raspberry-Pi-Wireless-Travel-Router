@@ -1,5 +1,5 @@
 # **About This Manual**
-So it all started with trying to recreate [NetworkChucks wireless travel router](https://www.youtube.com/@NetworkChuck). I was watching him and tried openWRT. Unfortunately, my WiFi first dongle doesn't support AP but for second that does support AP, openWRT does not have the driver. So I searched more and found RaspAP. I configured it but it is very unreliable. Many people can have only 1 or 2 devices connected at the same time and there is no fix at the moment. So I had to dig deeper. Nothing else was found. The only thing was to configure it myself from terminal. For this to work, I spent 2 weeks reaserching and finaly succeded with, I think, no problems. It seems big, bu half of it are examples of files that need to be changed. :)
+So it all started with trying to recreate [NetworkChucks wireless travel router](https://www.youtube.com/@NetworkChuck). I was watching him and tried openWRT. Unfortunately, my first WiFi dongle doesn't support AP but for second that does support AP, openWRT does not have the driver. So I searched more and found RaspAP. I configured it but it is very unreliable. Many people can have only 1 or 2 devices connected, some up tp 30 at the same time and there is no fix at the moment. I could have only 1 and sometimes 2 devices. So I had to dig deeper. Nothing else was found. The only thing was to configure it myself from terminal. For this to work, I spent 2 weeks reaserching and finaly succeded with, I think, no problems. It seems big, but half of it are examples of files that need to be changed. :)
 # **What do you need?**
 - Raspberry pi with built in NIC that has AP mode
 - WiFi dongle that doesn't need to support AP mode
@@ -75,7 +75,7 @@ To make this work we need **hostapd**, **dnsmasq** and **bridge-utils**. Type
 ```
 sudo apt-get install hostapd dnsmasq bridge-utils
 ```
-And wait. We need *hostapd* to create the access point. *Dnsmasq* is needed for DNS and DHCP configuration, while *bridge-utils* will create a bridge. The bridge is between **etho0** and **wlan0** interfaces. It will bridge them into one interface that we will call **br0**. When bridge because my raspberry pi 4 has ethernet and I want to connect my computer to pi's internet. If you do not want that just leave out *eth0* when the *br0* interface will be configured
+And wait. We need *hostapd* to create the access point. *Dnsmasq* is needed for DNS and DHCP configuration, while *bridge-utils* will create a bridge. The bridge is between **etho0** and **wlan0** interfaces. It will bridge them into one interface that will be called **br0**. We bridge because my raspberry pi 4 has ethernet and wireless interfaces. I want to connect my computer to pi's ethernet and be on the same LAN as well as my phone on wlan0. If you do not want that just leave out *eth0* when the *br0* interface will be configured
 # **Step 5. - Editing ```/etc/network/interfaces``` again**
 Type
 ```
@@ -119,7 +119,7 @@ So *eth0* and *wlan0* were added, with set to manual configuration(by br0 config
 If you do not want eth0 in there, remove eth0 from bridge_ports and set ```iface eth0 inet dhcp```
 !!!!!!!!!!
 ```
-Static interface address needs to be specified. Other is commented out because as I was repeating this to make sure everything works every time, I commented out options that were not needed. If you have some problem with ```networking.service``` at the and, try uncommenting some of them, but it should now be a problem because every commented option should be overwriten by dnsmasq.
+Static interface address needs to be specified. Other is commented out because as I was repeating this to make sure everything works every time, I commented out options that were not needed. If you have some problem with ```networking.service``` at the and, try uncommenting some of them, but it shouldn't be a problem now because every commented option should be overwriten by dnsmasq.
 # **Step 6. - Configuring hostapd**
 We need to create and edit hostapd.conf file to enable AP mode on our raspberry pi. Create and edit the file by typing
 ```
@@ -236,7 +236,7 @@ Save that. Now it is **crucial** to disable ```dhcpcd.service``` or we will have
 sudo systemctl disable dhcpcd.service
 ```
 # **Step 8. - Last tasks**
-In order to have internet connection when connected to he *AP*, we need to **enable ipv4 forwarding**. Edit 
+In order to have internet connection when connected to the *AP*, we need to **enable ipv4 forwarding**. Edit 
 ```
 sudo nano /etc/sysctl.conf
 ```
