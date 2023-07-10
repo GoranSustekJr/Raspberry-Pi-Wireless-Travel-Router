@@ -64,7 +64,9 @@ After the reboot
 ```
 ping google.com
 ```
-If it is good we should proceed to step 3.
+If it is good we should proceed to step 3. Else run the following command to troubleshoot:
+```sudo systemctl status networking```
+If it says
 # **Step 3. - Upating and upgrading the system**
 Every day you turn on your linux system you should update. So let's do it. Type in
 ```
