@@ -65,8 +65,30 @@ After the reboot
 ping google.com
 ```
 If it is good we should proceed to step 3. Else run the following command to troubleshoot:
-```sudo systemctl status networking```
+```
+sudo systemctl status networking
+```
 If it says
+```
+ctrl_iface exists and seems to be in use - cannot override it
+Delete '/var/run/wpa_supplicant/wlan1' manually if it is not used
+Fauked to initialize interface 'DIR=/var/run/wpa_supplicant GROUP=netdev'.
+.....
+...
+...
+...
+...
+...
+ifup: failed to bring up wlan1
+```
+Then you must delete ```/var/run/wpa_supplicant/wlan1``` and reboot. So type in
+```
+sudo rm /var/run/wpa_supplicant/wlan1
+```
+And then
+```
+sudo reboot
+```
 # **Step 3. - Upating and upgrading the system**
 Every day you turn on your linux system you should update. So let's do it. Type in
 ```
@@ -143,7 +165,7 @@ ssid=ThisIsExampleSSID
 hw_mode=g
 # If hw_mode set to a, uncomment next two lines for ac mode which is supported on raspberry pi 4 B AND CHANGE CHANNEL!!!!!!!!
 #ieee80211ac=1 
-#vht_oper_chwidth=1s
+#require_vht=1
 
 # Country
 country_code=ThisIsExampleCountryItIsTheSameAsInInterfacesFile
@@ -176,7 +198,7 @@ Save and exit. We have specified interface *wlan0* which we want in AP mode. Als
 ```
 hw_mode=a# If hw_mode set to a, uncomment next two lines for ac mode which is supported on raspberry pi 4 B AND CHANGE CHANNEL!!!!!!!!
 ieee80211ac=1 
-vht_oper_chwidth=1s
+require_vht=1
 # Channel - CHANGEEE IF 5GHz chosen to which channel you want
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!CHANGE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 channel=6
