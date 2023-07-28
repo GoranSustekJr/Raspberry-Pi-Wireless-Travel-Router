@@ -250,7 +250,8 @@ sudo nano /etc/dnsmasq.conf
 The default file is huge and all commented out. On top just add the following lines:
 ```
 #  DHCP configuration
-dhcp-range=br0,192.168.200.20,192.168.200.220,255.255.255.0,24h
+interface=br0
+dhcp-range=192.168.200.20,192.168.200.220,255.255.255.0,24h
 # DNS configuration
 server=1.1.1.1
 server=8.8.8.8
