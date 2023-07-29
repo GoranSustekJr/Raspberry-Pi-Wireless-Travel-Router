@@ -1,18 +1,18 @@
 # **About This Manual**
-So it all started with trying to recreate [NetworkChucks wireless travel router](https://www.youtube.com/@NetworkChuck). I was watching him and tried openWRT. Unfortunately, my first WiFi dongle doesn't support AP mode, and the second one that does support AP mode doesn't have a driver for openWRT. So I searched more and found RaspAP. I configured it but it is very unreliable. Some people could only connect 1 or 2 devices, while others were able to connect up to 30 devices simultaneously. I could have only 1 and sometimes 2 devices. So I had to dig deeper. However, I was unable to find any other viable solutions. The only possible solution was to configure it myself from terminal. For this to work, I spent 2 weeks reaserching and finaly succeded with, I think, no problems. It seems big, but half of it are examples of files that need to be changed. :)
+So it all started with trying to recreate [NetworkChucks wireless travel router](https://www.youtube.com/@NetworkChuck). I was watching him and tried openWRT. Unfortunately, my first WiFi dongle doesn't support AP mode, and the second one that supports AP mode doesn't have a driver for OpenWRT. So I searched more and found RaspAP. I configured it but it is very unreliable. Some people could only connect 1 or 2 devices, while others were able to connect up to 30 devices simultaneously. I could only have 1 and sometimes 2 devices. So I had to dig deeper. However, I was unable to find any other viable solutions. The only possible solution was to configure it myself from terminal. For this to work, I spent 2 weeks researching and finally succeded with, I think, no problems. It seems big, but half of it are examples of files that need to be changed. :)
 # **What do you need?**
 - Raspberry pi with built in NIC that has AP mode
 - WiFi dongle that doesn't need to support AP mode
 - Monitor, keyboard, mouse, SD card
 - Will to learn
 # **Step 1. - Choosing OS**
-You need an OS to burn to SD card. I choose Raspbian Lite because I am doing it on 4GB SD card. You can use BalenaEtcher or Rufus or Pi Imager to burn. If you have a bigger SD card mabe choose desktop version, or ubuntu with or without dekstop. After you burn it, put SD card into your pi, boot it up and SSh into it, or connect the pi to the monitor with keyboard and mouse. Make sure to plug in you WiFi dongle.
+You need an OS to burn to SD card. I choose Raspbian Lite because I am doing it on a 4GB SD card. You can use BalenaEtcher or Rufus or Pi Imager to burn. If you have a bigger SD card maybe choose desktop version, or ubuntu with or without dekstop. After you burn it, put SD card into your pi, boot it up and SSh into it, or connect the pi to the monitor with keyboard and mouse. Make sure to plug in you WiFi dongle.
 # **Step 2. - Connecting to your home WiFi via USB dongle**
 In order to connect our USB dongle to internet first we check if it is plugged in with command
 ```
 lsusb
 ```
-You shall se your USB, if not you need to install driver for it. Look at your wireless interfaces with command ```iwconfig```. It shall output something like this
+You shall see your USB, if not you need to install driver for it. Look at your wireless interfaces with the command ```iwconfig```. It shall output something like this
 ```
 lo        no wireless extensions.
 
@@ -60,7 +60,7 @@ Make sure to change ```country=US``` to your country. Also change ```ssid="SSID"
 ```
 sudo reboot
 ```
-After the reboot
+After the reboot,
 ```
 ping google.com
 ```
